@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Conformité YAKO AFRICA — Conflits d'intérêts
 
 Application Laravel 10 **autonome**, issue de l'extraction du module « Conformité / Conflits d'intérêts » du SI-RH.
@@ -143,3 +144,6 @@ Un agent connecté au SI-RH arrive alors directement connecté sur la Conformit�
 
 - Base de données dédiée : remplacer la lecture directe des tables SI-RH par une API du SI-RH (ou une vue SQL / un compte MySQL en lecture seule sur ces tables).
 - Compte MySQL dédié avec `SELECT` uniquement sur les tables SI-RH : protection au niveau base, en plus du trait `LectureSeule`.
+=======
+# si-conformites
+>>>>>>> 03883d6ba304cec853c18729e625e736379a44e0
