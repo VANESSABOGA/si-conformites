@@ -1,0 +1,171 @@
+<section class="top_sec" style="background-color: #033f1f !important; font-weight:bold;">
+
+    <div class="container">
+
+        <div class="row">
+
+            <div class="col-xs-12 col-md-6 top_lft">
+
+                <div class="soc_ico">
+
+                    <ul>
+
+                        <li class="tweet">
+
+                            <a href="#">
+
+                                <i class="fa fa-twitter"></i>
+
+                            </a>
+
+                        </li>
+
+                        <li class="fb">
+
+                            <a href="#">
+
+                                <i class="fa fa-facebook"></i>
+
+                            </a>
+
+                        </li>
+
+                        <li class="insta">
+
+                            <a href="#">
+
+                                <i class="fa fa-instagram"></i>
+
+                            </a>
+
+                        </li>
+
+                        <li class="linkd">
+
+                            <a href="#">
+
+                                <i class="fa fa-linkedin"></i>
+
+                            </a>
+
+                        </li>
+
+                        <li class="ytube">
+
+                            <a href="#">
+
+                                <i class="fa fa-youtube"></i>
+
+                            </a>
+
+                        </li>
+
+                        <li class="rss">
+
+                            <a href="#">
+
+                                <i class="fa fa-rss"></i>
+
+                            </a>
+
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                <div class="sig_in">
+
+                    <p>YAKO AFRICA ASSURANCES VIE</p>
+
+                </div>
+
+
+
+            </div>
+
+            <!-- /.top-left -->
+
+            <div class="col-xs-12 col-md-6 top_rgt">
+
+                <?php if ($estmembre != '1'){?>
+
+                <div class="sig_in">
+
+                    <p>
+
+                        <div class="dropdown collapse">
+
+                            <i class="fa fa-user"></i>
+
+                            <button class="btn btn-neutre dropdown-toggle" type="button" data-toggle="dropdown"> Connexion<span class="caret"></span></button>
+
+
+
+                            <ul class="dropdown-menu cnx_menu">
+
+                                <li><a href="#login_box" data-toggle="modal">PARTICULIER</a></li>
+
+                                <li><a href="#login_box" data-toggle="modal">ENTREPRISE</a></li>
+
+                                <li><a href="#login_box" data-toggle="modal">COMMERCIAUX</a></li>
+
+
+
+                                <li id="inscrire"><a class="reg_btn" href="#reg_box" data-toggle="modal">S'INCRIRE</a></li>
+
+                            </ul>
+
+                        </div>
+
+
+
+
+
+                        <a class="reg_btn" href="#reg_box" data-toggle="modal"> Inscription </a> </p>
+
+                </div>
+
+                <?php }else{  ?>
+
+                <div align="center" style="height:auto; padding:0px;">
+
+                    <span style=" font-size:11px;color:#000; font-weight:bold"><?php echo substr(ucfirst($nom).' '.ucfirst($prenom).', ',0,20) ?></span>
+
+
+
+                    <span style="height:auto; padding:0px; font-size:11px;"><a href="../dcnx.php">[D&eacute;connexion</a> | <a href="https://www.laloyalevie.com:2095">Mails] </a></span></div>
+
+                <?php }?>
+
+
+
+                <div class="submit_prop">
+
+                    <h3 class="subm_btn">
+
+                        <a href="#prop_box" data-toggle="modal">
+
+                            <i class="fa fa-bars"></i>
+
+                            <span> Souscrire à un contrat </span></a>
+
+                    </h3>
+
+                </div>
+
+
+
+            </div>
+
+            <!-- /.top-right -->
+
+        </div>
+
+        <!-- /.row -->
+
+    </div>
+
+    <!-- /.container -->
+
+</section>

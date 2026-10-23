@@ -1,0 +1,606 @@
+<div ng-controller="encaissCtrl" class="main">
+    <div class="spinner" ng-show="loading"></div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <h3>ETAT DES COTISATIONS</h3>
+        </div>
+    </div>
+
+    <form class="form" name="form" ng-model='form'>
+        <fieldset>
+            <legend>Paramètre d'impression</legend>
+            <div class="col-md-2 col-xs-2 col-lg-2 hide">
+                <label> IDagent  </label><br />
+                <input class="form-control" type="text" id="codeAgent" name="codeAgent" ng-model="codeAgent" placeholder="ID codeAgent" disabled="true">
+            </div>
+            <div class="col-md-2 col-xs-2 col-lg-2">
+                <label> ID contrat   </label><br />
+                <input class="form-control" type="text" id="idcontrat" name="idcontrat" ng-model="idContrat" placeholder="ID contrat" ng-disabled="{{ isDisabled }}">
+            </div>
+            <div class="col-md-2 col-xs-2 col-lg-2">
+                <label> N° Bulletin </label><br />
+                <input class="form-control" type="text" id="codeProposition" name="codeProposition" ng-model="codeProposition" ng-disabled="{{ isDisabled }}">
+            </div>
+            <div class="col-md-2 col-xs-2 col-lg-2">
+                <label> N° Police </label><br />
+                <input class="form-control" type="text" id="numPolice" name="numPolice" ng-model="numPolice" ng-disabled="{{ isDisabled }}">
+            </div>
+            <div class="col-md-2 col-xs-2 col-lg-2">
+                <label>Période du</label><br />
+                <input class="form-control" type="date" id="periodeDeb" name="periodeDeb" ng-model="periodeDeb">
+            </div>
+            <div class="col-md-2 col-xs-2 col-lg-2">
+                <label> Au</label><br />
+                <input class="form-control" type="date" id="periodeFin" name="periodeFin" ng-model="periodeFin">
+
+            </div>
+            <div class="col-md-2 col-xs-2 col-lg-2">
+                <br />
+                <button class="btn btn-warning btn-lg" name="submit" type="submit" id="cont-submit" data-submit="...Sending" ng-click="AffEncaissement(); showme=true" ng-model="details">Afficher</button><br />
+                <button ng-show="showme" style="position: fixed;  float:right" type="button" class="btn btn-success" ng-click="printPDF()" style="float: right;"><span>Imprimer</span><i class="fa fa-print" aria-hidden="true"></i></button>
+            </div>
+
+        </fieldset>
+    </form>
+
+    <div class="row">
+        <div class="col-md-12 col-xs-12 col-lg-12" style="display: none; padding: 10px; margin-bottom: 10px; text-align: right;" id="myprint">
+
+            <div id='printlink' style="display: none"></div>
+        </div>
+    </div>
+
+    <div id="printerEnc" ng-show="showme">
+        <div class="encEntete">
+            <div class="row">
+                <div class="col-md-12 col-xs-12 col-lg-12">
+                    <table width="100% ">
+                        <tbody>
+                            <tr>
+                                <td>N°Formulaire :</td>
+                                <td><span>{{ detail[0].CodepropositionForm
+ }}</span></td>
+                                <td rowspan="3 " colspan="4 ">
+                                    <div id="detailPanel ">
+                                        <span class="label ">ID........... :</span><span style="text-decoration: underline; ">{{ detail[0].IdProposition }}</span> <span>-</span> <span style="text-decoration: underline; ">{{ detail[0].ID }}</span><br />
+                                        <span class="label ">GUID............. :</span><span>{{ detail[0].GUUID}}</span><br />
+                                        <span class="label ">N° Proposition... :</span><span>{{ detail[0].CodeProposition }}</span><br />
+                                        <span class="label ">N° Contrôle...... :</span><span>{{ detail[0].IDUnique }}</span><br />
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Produit :</td>
+                                <td><span>{{ detail[0].produit }}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Agent :</td>
+                                <td><span class="label label-succes ">{{ detail[0].CodeConseiller }}</span><span>{{ detail[0].NomAgent }}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Statut :</td>
+                                <td>{{ detail[0].OnStdbyOff }}
+                                    <span ng-switch="detail[0].OnStdbyOff ">
+								<span ng-switch-when=1>En cours.</span>
+                                    <span ng-switch-when=2>En veille</span>
+                                    <span ng-switch-when=3>Arrêté</span>
+                                    <span ng-switch-default>Inconnu</span>
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Capital :</td>
+                                <td><span>{{ detail[0].CapitalSouscrit | number:0 }} FCFA</span></td>
+                            </tr>
+                            <tr>
+                                <td>Effet d'adhésion : </td>
+                                <td><span>{{ detail[0].DateEffetReel | date:'d/MM/yyyy'}}</span></td>
+                                <td>Durée Réglements :</td>
+                                <td><span>{{ detail[0].DureeCotisationAns }} ans {{ detail[0].DureeCotisationMois }} mois</span></td>
+                                <td>Fin cotisation :</td>
+                                <td><span>{{ detail[0].FinAdhesion | date:'d/MM/yyyy'}}</span></td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                    <hr>
+                    <table width="100% ">
+                        <tbody>
+                            <tr>
+                                <td>Nbre Emission :</td>
+                                <td><span>{{ detail[0].NbreEmission | number:0 }}</span></td>
+                                <td>Nbre Réglements :</td>
+                                <td><span>{{ detail[0].NbreEncaissment | number:0 }}</span></td>
+                                <td>Nbre Impayés :</td>
+                                <td><span>{{ detail[0].NbreImpayes | number:0 }}</span></td>
+                            </tr>
+                            <tr>
+                                <td>Emissions :</td>
+                                <td><span>{{ detail[0].TotalEmission | number:0 }} FCFA</span></td>
+                                <td>Réglements :</td>
+                                <td><span>{{ detail[0].TotalEncaissement | number:0 }} FCFA</span></td>
+                                <td>Impayés :</td>
+                                <td><span>{{ detail[0].TotalImpayes | number:0 }} FCFA</span></td>
+
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- End col-6-->
+
+            </div>
+            <!-- End row -->
+        </div>
+        <div class="encEntete " ng-show="showme ">
+            <div class="row ">
+                <div class="col-md-12 col-xs-12 col-lg-12 ">
+                    <table width="100% " class="table ">
+                        <thead>
+                            <tr>
+                                <th colspan="2 " width="30% ">ADHERENT / SOUSCRIPTEUR</th>
+                                <th colspan="2 ">
+                                    <div> </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Nom :</td>
+                                <td><span>{{ detail[0].nomSous }}</span></td>
+                                <td>Prénom :</td>
+                                <td><span> {{ detail[0].PrenomSous }} </span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="encEntete " ng-show="showmem ">
+            <div class="row ">
+                <div class="col-md-12 col-xs-12 col-lg-12 ">
+                    <table width="100% " class="table ">
+                        <thead>
+                            <tr>
+                                <th>ASSURES</th>
+                                <th class="theaColor "></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="2 ">
+                                    <table width="100% ">
+                                        <thead>
+                                            <tr>
+                                                <th width="25% "></th>
+                                                <th>Garantie</th>
+                                                <th>Date Effet</th>
+                                                <th>Frais Accs.</th>
+                                                <th>Prime Hors Accs.</th>
+                                                <th>Prime totale</th>
+                                                <th>Périodicité</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="assure in assures ">
+                                                <td>{{ assure.NomPrenom }}</td>
+                                                <td>{{ assure.MonLibelle }}</td>
+                                                <td>{{ assure.DateEffet | date:'d/MM/yyyy'}}</td>
+                                                <td>{{ assure.FraisAcces }}</td>
+                                                <td>{{ assure.Capital | number:0}} FCFA</td>
+                                                <td>{{ assure.Prime }} FCFA</td>
+                                                <td><span ng-switch="assure.CodePeriodicite ">
+													<span ng-switch-when="M ">Mensuelle</span>
+                                                    <span ng-switch-when="T ">Trimestrielle</span>
+                                                    <span ng-switch-when="S ">Sémestrielle</span>
+                                                    <span ng-switch-when="A ">Annuelle</span>
+                                                    <span ng-switch-default>Inconnu</span>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="encEntete " ng-show="showmem ">
+            <div class="row ">
+                <div class="col-md-12 col-xs-12 col-lg-12 ">
+                    <table width="100% " class="table ">
+                        <thead>
+                            <tr>
+                                <th>PAYEUR(s) DE PRIME</th>
+                                <th class="theaColor "></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td colspan="2 ">
+                                    <table width="100% ">
+                                        <thead>
+                                            <tr>
+                                                <th width="25% "></th>
+                                                <th>Mode de paiement</th>
+                                                <th>Organisme</th>
+                                                <th>N°Compte</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="payeur in payeurs ">
+                                                <td>{{ payeur.NomPrenom }}</td>
+                                                <td>{{ payeur.CodeModePaiement }}</td>
+                                                <td>{{ payeur.Societe }}</td>
+                                                <td>{{ payeur.NumCompte }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="headEnc ">
+            <!-- regelement En attente-->
+            <table width="100% " class="table table-striped ">
+                <thead>
+                    <tr>
+                        <th width="100% " style="text-align: left; ">PRIMES NON REGLEES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td width="100% ">
+                            <table width="100% " class="table table-striped ">
+                                <tr>
+                                    <td width="100% ">
+                                        <table width="100% ">
+                                            <tr>
+                                                <th width="30% " style="text-align: left; "> Facture</th>
+                                                <th width="70% " style="text-align: left; ">| Réglements</th>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="100% ">
+                                        <table width="100% " class="table table-striped ">
+                                            <thead>
+                                                <tr>
+                                                    <th width="5% "></th>
+                                                    <th width="10% ">N&deg;</th>
+                                                    <th width="15% ">Date Emis.</th>
+                                                    <th width="10% ">Montant</th>
+                                                    <th width="10% ">Montant réglé</th>
+                                                    <th width="15% ">Date reglt</th>
+                                                    <th width="10% ">Ref. reglt</th>
+                                                    <th width="10% ">Mode</th>
+                                                    <th width="10% ">Reglée</th>
+                                                    <th width="5 ">Statut *</th>
+                                                </tr>
+                                            </thead>
+                                            <!-- -->
+                                            <tbody>
+                                                <tr ng-repeat='contrat in nonRegle'>
+                                                    <td>{{ $index+1 }}</td>
+                                                    <td>{{ contrat.IdPresentation }}</td>
+                                                    <td>{{ contrat.MaDate | date:'d/MM/yyyy'}}</td>
+                                                    <td>{{ contrat.MontantNet | number:0 }}</td>
+                                                    <td>{{ contrat.RegltMontant | number:0 }}</td>
+                                                    <td>{{ contrat.RegltDate | date:'d/MM/yyyy' }}</td>
+                                                    <td>{{ contrat.RegltRef }}</td>
+                                                    <td>{{ contrat.RegltCodePaiement }}</td>
+                                                    <td>
+                                                        <span ng-switch="contrat.Etat ">
+														<span ng-switch-when="1 ">En att.</span>
+                                                        <span ng-switch-when="6 ">Nn réglé</span>
+                                                        <span ng-switch-when="4 ">Part.</span>
+                                                        <span ng-switch-when="2 ">Réglé</span>
+                                                        <span ng-switch-when="3 ">Encais.</span>
+                                                        <span ng-switch-when="0 ">Annulé</span>
+                                                        <span ng-switch-default></span>
+                                                        </span>
+                                                    </td>
+                                                    <td width="5% ">{{ contrat.Statut }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="3 "></td>
+                                                    <td>{{ totMontantNet | number:0 }}</td>
+                                                    <td>{{ totRegltMontant | number:0 }}</td>
+                                                    <td colspan="5 "></td>
+                                                </tr>
+                                            </tbody>
+
+
+                                        </table>
+                                    </td>
+
+                                </tr>
+                            </table>
+                        </td>
+
+                </tbody>
+
+            </table>
+            <table width="100% " class="table table-striped ">
+                <thead>
+                    <tr>
+                        <th width="100% " style="text-align: left; ">PRIMES REGLEES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td width="100% ">
+                            <table width="100% " class="table table-striped ">
+                                <tr>
+                                    <td width="100% ">
+                                        <table width="100% ">
+                                            <tr>
+                                                <th width="30% " style="text-align: left; "> Facture</th>
+                                                <th width="70% " style="text-align: left; ">| Réglements</th>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="100% ">
+                                        <table width="100% " class="table table-striped ">
+                                            <thead>
+                                                <tr>
+                                                    <th width="5% "></th>
+                                                    <th width="10% ">N&deg;</th>
+                                                    <th width="15% ">Date Emis.</th>
+                                                    <th width="10% ">Montant</th>
+                                                    <th width="10% ">Montant réglé</th>
+                                                    <th width="15% ">Date reglt</th>
+                                                    <th width="10% ">Ref. reglt</th>
+                                                    <th width="10% ">Mode</th>
+                                                    <th width="10% ">Reglée</th>
+                                                    <th width="5 ">Statut *</th>
+                                                </tr>
+                                            </thead>
+                                            <!-- -->
+                                            <tbody>
+                                                <tr ng-repeat='contrat in confirmer'>
+                                                    <td>{{ $index+1 }}</td>
+                                                    <td>{{ contrat.IdPresentation }}</td>
+                                                    <td>{{ contrat.MaDate | date:'d/MM/yyyy'}}</td>
+                                                    <td>{{ contrat.MontantNet | number:0 }}</td>
+                                                    <td>{{ contrat.RegltMontant | number:0 }}</td>
+                                                    <td>{{ contrat.RegltDate | date:'d/MM/yyyy' }}</td>
+                                                    <td>{{ contrat.RegltRef }}</td>
+                                                    <td>{{ contrat.RegltCodePaiement }}</td>
+                                                    <td>
+                                                        <span ng-switch="contrat.Etat ">
+														<span ng-switch-when="1 ">En att.</span>
+                                                        <span ng-switch-when="6 ">Nn réglé</span>
+                                                        <span ng-switch-when="4 ">Part.</span>
+                                                        <span ng-switch-when="2 ">Réglé</span>
+                                                        <span ng-switch-when="3 ">Encais.</span>
+                                                        <span ng-switch-when="0 ">Annulé</span>
+                                                        <span ng-switch-default></span>
+                                                        </span>
+                                                    </td>
+                                                    <td width="5% ">{{ contrat.Statut }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="3 "></td>
+                                                    <td>{{ totMontantNet | number:0 }}</td>
+                                                    <td>{{ totRegltMontant | number:0 }}</td>
+                                                    <td colspan="5 "></td>
+                                                </tr>
+                                            </tbody>
+
+
+                                        </table>
+                                    </td>
+
+                                </tr>
+                            </table>
+                        </td>
+
+
+
+                </tbody>
+
+
+
+            </table>
+
+            <!--Reglemet partiellement -->
+            <table width="100% " class="table table-striped ">
+                <thead>
+                    <tr>
+                        <th width="100% " style="text-align: left; ">PRIMES REGLEES PARTIELLEMENTS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td width="100% ">
+                            <table width="100% " class="table table-striped ">
+                                <tr>
+                                    <td width="100% ">
+                                        <table width="100% ">
+                                            <tr>
+                                                <th width="30% " style="text-align: left; "> Facture</th>
+                                                <th width="70% " style="text-align: left; ">| Réglements</th>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="100% ">
+                                        <table width="100% " class="table table-striped ">
+                                            <thead>
+                                                <tr>
+                                                    <th width="5% "></th>
+                                                    <th width="10% ">N&deg;</th>
+                                                    <th width="15% ">Date emis.</th>
+                                                    <th width="10% ">Montant</th>
+                                                    <th width="10% ">Montant réglé</th>
+                                                    <th width="15% ">Date reglt</th>
+                                                    <th width="10% ">Ref. reglt</th>
+                                                    <th width="10% ">Mode</th>
+                                                    <th width="10% ">Reglée</th>
+                                                    <th width="5 ">Statut *</th>
+                                                </tr>
+                                            </thead>
+                                            <!-- -->
+                                            <tbody>
+                                                <tr ng-repeat='contrat in partielle'>
+                                                    <td>{{ $index+1 }}</td>
+                                                    <td>{{ contrat.IdPresentation }}</td>
+                                                    <td>{{ contrat.MaDate | date:'d/MM/yyyy'}}</td>
+                                                    <td>{{ contrat.MontantNet | number:0 }}</td>
+                                                    <td>{{ contrat.RegltMontant | number:0 }}</td>
+                                                    <td>{{ contrat.RegltDate | date:'d/MM/yyyy' }}</td>
+                                                    <td>{{ contrat.RegltRef }}</td>
+                                                    <td>{{ contrat.RegltCodePaiement }}</td>
+                                                    <td>
+                                                        <span ng-switch="contrat.Etat ">
+														<span ng-switch-when="1 ">En att.</span>
+                                                        <span ng-switch-when="6 ">Nn réglé</span>
+                                                        <span ng-switch-when="4 ">Part.</span>
+                                                        <span ng-switch-when="2 ">Réglé</span>
+                                                        <span ng-switch-when="3 ">Encais.</span>
+                                                        <span ng-switch-when="0 ">Annulé</span>
+                                                        <span ng-switch-default></span>
+                                                        </span>
+                                                    </td>
+                                                    <td width="5% ">{{ contrat.Statut }}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="3 "></td>
+                                                    <td>{{ totMontantNet | number:0 }}</td>
+                                                    <td>{{ totRegltMontant | number:0 }}</td>
+                                                    <td colspan="5 "></td>
+                                                </tr>
+                                            </tbody>
+
+
+                                        </table>
+                                    </td>
+
+                                </tr>
+                            </table>
+                        </td>
+
+
+
+                </tbody>
+
+            </table>
+        </div>
+        <div id="canvasPrint "></div>
+
+    </div>
+
+    <div class="row " ng-show="showme ">
+        <div class="col-md-12 col-xs-12 col-lg-12 ">
+            <h3>Détail des statuts *</h3>
+            <hr>
+            <table width="100% ">
+                <thead>
+                    <tr>
+                        <th width="2% ">Statut</th>
+                        <th width="5% ">Libellé</th>
+                        <th width="2% ">Statut</th>
+                        <th width="5% ">Libellé</th>
+                        <th width="2% ">Statut</th>
+                        <th width="5% ">Libellé</th>
+                        <th width="2% ">Statut</th>
+                        <th width="5% ">Libellé</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>*0</td>
+                        <td>En activité</td>
+                        <td>05</td>
+                        <td>Pas de compte</td>
+                        <td>13</td>
+                        <td>Client décédé</td>
+                        <td>60</td>
+                        <td>Retraite pour limite d'âge</td>
+                    </tr>
+                    <tr>
+                        <td>*8</td>
+                        <td>Arrêt Recensement 2011</td>
+                        <td>06</td>
+                        <td>Compte Provision insuffisante</td>
+                        <td>20</td>
+                        <td>Suspendu sans solde</td>
+                        <td>61</td>
+                        <td>Retraite pour ancienneté</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>Annulé</td>
+                        <td>07</td>
+                        <td></td>
+                        <td>33</td>
+                        <td>Inconnu</td>
+                        <td>70</td>
+                        <td>Sous contrôle Abidjan Lagune</td>
+                    </tr>
+                    <tr>
+                        <td>00</td>
+                        <td>Ok (Paiem. Effectué)</td>
+                        <td>08</td>
+                        <td>Clé compte erronée</td>
+                        <td>37</td>
+                        <td>Inactive Acct Ops Mgr Approval</td>
+                        <td>82</td>
+                        <td>Arrêt Recensement 2010</td>
+                    </tr>
+                    <tr>
+                        <td>01</td>
+                        <td>Pas d'Autorisation</td>
+                        <td>09</td>
+                        <td></td>
+                        <td>40</td>
+                        <td>Abandon de poste</td>
+                        <td>86</td>
+                        <td>Arrêt Corps habillés</td>
+                    </tr>
+                    <tr>
+                        <td>02</td>
+                        <td>Opposition du client</td>
+                        <td>-1</td>
+                        <td>Opposition débit, voir Gestionnaire</td>
+                        <td>50</td>
+                        <td>Détaché</td>
+                        <td>88</td>
+                        <td>Défaut de Provision</td>
+                    </tr>
+                    <tr>
+                        <td>03</td>
+                        <td>Opposition d'un tiers</td>
+                        <td>10</td>
+                        <td>Contentieux</td>
+                        <td>51</td>
+                        <td>Disponibilité</td>
+                        <td>9</td>
+                        <td>Agent en liquidation de droits</td>
+                    </tr>
+                    <tr>
+                        <td>04</td>
+                        <td>Compte fermé</td>
+                        <td>12</td>
+                        <td>Compte Bloqué pas de débit</td>
+                        <td>56</td>
+                        <td>Décès</td>
+                        <td>91</td>
+                        <td>Regul. Indemnités</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
